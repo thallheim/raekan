@@ -1,0 +1,5 @@
+#include "wx/msw/wx.rc"
+
+APP_ICON ICON "res/doge-shades.ico"
+TOOL_DOGE ICON "res/doge-shades.ico"
+TOOL_DOGE2 ICON "res/doge.ico"

@@ -1,0 +1,4 @@
+build/
+*.exe
+*.lnk
+compile_flags.txt
