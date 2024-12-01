@@ -12,4 +12,6 @@ A thing.
 ---
 # TODO
 
-  * [ ] Clean up for VC init
+  * [ ] Add map pane
+  * [ ] Add random distrib of something
+  * [ ] Make map pannable
