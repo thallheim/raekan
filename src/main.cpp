@@ -1,8 +1,3 @@
-#include "main.hpp"
-#include "ui/cDrawPane.hpp"
-#include "ui/cPanel_Main.hpp"
-#include "util/RandGen.hpp"
-
 #include "wx/log.h"
 #include "wx/aboutdlg.h"
 #include "wx/event.h"
@@ -16,6 +11,12 @@
 #include "wx/toolbar.h"
 #include "wx/toplevel.h"
 #include "wx/utils.h"
+
+#include "main.hpp"
+#include "ui/cDrawPane.hpp"
+#include "ui/cPanel_Main.hpp"
+#include "util/RandGen.hpp"
+#include "ui/cMapPane.hpp"
 
 #include <string>
 
@@ -87,12 +88,14 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Raekan", wxPoint(300,300), wxSize(8
   m_book = new wxNotebook(this, -1);
 
   // Main tabs
-  cPanel_Main* m_panelMain = new cPanel_Main(m_book);
-  cDrawPane* m_drawPane = new cDrawPane(m_book, this);
+  cPanel_Main* m_panelMain = new cPanel_Main(m_book      );
+  cDrawPane*   m_drawPane  = new cDrawPane(  m_book, this);
+  cMapPane*    m_mapPane   = new cMapPane(   m_book, this);
 
   // Add tabs to notebook
   m_book->AddPage(m_panelMain, "Main", true);
   m_book->AddPage(m_drawPane, "Drawing", false);
+  m_book->AddPage(m_mapPane, "Map", false);
 
   wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
 
@@ -176,8 +179,8 @@ void cMain::OnChooseFont(wxCommandEvent& event) {
     m_selectedFont = font;
     wxColour color = fontData.GetColour();
     wxLogStatus("Selected Font: %s, Color: #%02X%02X%02X",
-                 font.GetFaceName(),
-                 color.Red(), color.Green(), color.Blue());
+                font.GetFaceName(),
+                color.Red(), color.Green(), color.Blue());
 
     wxCommandEvent fontChangedEvent(FONT_CHANGE_EVENT);
     ProcessEvent(fontChangedEvent);
