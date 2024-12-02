@@ -1,3 +1,5 @@
+#include "wx/log.h"
+#include "wx/translation.h"
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
   #include <wx/wx.h>
@@ -26,15 +28,14 @@ cPanel_Main::cPanel_Main(wxWindow* parent)
   SetBackgroundColour(wxColour(55, 55, 55, 255));
 
   wxButton* m_buttonQ = new wxButton(this, ID_BTN_NEW_SEED, "New seed", wxPoint(5, 5), wxSize(100, 30));
-  wxButton* m_button1 = new wxButton(this, ID_BTN_2, "Two button", wxPoint(120, 5), wxSize(100, 30));
-  m_seedDisplay = new wxTextCtrl(this, -1, "HENLO, SEEDO",  wxPoint(5, 45), wxSize(100,20), wxTE_READONLY | wxTE_LEFT | wxTE_NOHIDESEL | wxTE_RICH2);
-   
+  wxButton* m_button1 = new wxButton(this, ID_BTN_2, ("Button two"), wxPoint(120, 5), wxSize(100, 30));
+  m_seedDisplay = new wxTextCtrl(this, -1, "Seed",  wxPoint(5, 45), wxSize(100,20), wxTE_READONLY | wxTE_LEFT | wxTE_NOHIDESEL | wxTE_RICH2);
 }
 
 cPanel_Main::~cPanel_Main() {}
 
 void cPanel_Main::OnButtonTwo(wxCommandEvent& WXUNUSED(event)) {
-
+  wxLogMessage("Woo!");
 }
 
 void cPanel_Main::OnNewSeed(wxCommandEvent& event) {

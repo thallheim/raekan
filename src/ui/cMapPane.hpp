@@ -17,6 +17,8 @@ public:
   void paintEvent(wxPaintEvent & evt);
   void paintNow();
   void render(wxDC& dc);
+
+  void DrawStar(int x, int y, int width, int heigth, wxDC &dc);
 private:
   cMain* m_parent;
 

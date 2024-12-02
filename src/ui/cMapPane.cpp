@@ -42,4 +42,15 @@ void cMapPane::render(wxDC& dc) {
   dc.SetBrush(*wxRED_BRUSH); // blue filling
   dc.SetPen( wxPen( wxColor(80,175,80), 5 ) );
   dc.DrawRectangle( 25, 25, 300, 175 );
+
+  this->DrawStar(25, 300, 50, 50, dc);
+}
+
+void cMapPane::DrawStar(int x, int y, int width, int heigth, wxDC &dc)
+{
+    dc.DrawText("Star", dc.FromDIP(x + 10), dc.FromDIP(y + 10));
+    dc.SetClippingRegion(dc.FromDIP(x), dc.FromDIP(y), dc.FromDIP(width), dc.FromDIP(heigth));
+    dc.SetPen(wxPen(*wxBLUE, 1));
+    dc.CrossHair(dc.FromDIP(x + width / 2), dc.FromDIP(y + heigth / 2));
+    dc.DestroyClippingRegion();
 }

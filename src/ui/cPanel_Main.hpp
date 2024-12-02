@@ -24,7 +24,6 @@ private:
   wxTextCtrl* m_seedDisplay;
   int m_seed1 = NULL;
   
-  // TODO: Sort event handler out again
   wxDECLARE_EVENT_TABLE();
 
 };
