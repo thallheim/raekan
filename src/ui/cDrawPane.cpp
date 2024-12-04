@@ -1,17 +1,17 @@
-#include "wx/log.h"
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
   #include <wx/wx.h>
 #endif
-
+#include "wx/font.h"
+#include "wx/fontdata.h"
+#include "wx/log.h"
 #include "wx/event.h"
 #include "wx/gdicmn.h"
 
 #include "cDrawPane.hpp"
-#include "../main.hpp"
 
 wxBEGIN_EVENT_TABLE(cDrawPane, wxPanel)
-    EVT_PAINT(cDrawPane::paintEvent)
+    EVT_PAINT(cDrawPane::OnPaint)
     // some useful events
 /*
  EVT_MOTION(BasicDrawPane::mouseMoved)
@@ -36,19 +36,19 @@ wxBEGIN_EVENT_TABLE(cDrawPane, wxPanel)
 
 wxEND_EVENT_TABLE()
 
-cDrawPane::cDrawPane(wxWindow* parent, cMain* main)
-: wxWindow(parent, -1), m_parent(main) {
+cDrawPane::cDrawPane(wxWindow* parent)
+: wxPanel(parent, -1) {
   SetBackgroundColour(wxColour(105, 130, 153, 255));
-
 
   wxBoxSizer* drawPaneSizer = new wxBoxSizer(wxVERTICAL);
   SetSizer(drawPaneSizer);
 
+  // Bind(FONT_CHANGE_EVENT, &cDrawPane::OnParentFontChanged, this);
 }
 
 cDrawPane::~cDrawPane() {}
 
-void cDrawPane::paintEvent(wxPaintEvent & evt) {
+void cDrawPane::OnPaint(wxPaintEvent & evt) {
   wxPaintDC dc(this);
   render(dc);
 }
@@ -56,20 +56,18 @@ void cDrawPane::paintEvent(wxPaintEvent & evt) {
 void cDrawPane::render(wxDC& dc) {
   // draw some text
   dc.SetTextBackground(*wxLIGHT_GREY);
-  dc.SetTextForeground(*wxGREEN);
- 
-  wxFont font = m_parent->getSelectedFont();
+  dc.SetTextForeground(wxColour(0,50,200,255));
+
+  std::string fontNameLabel = "Font:";
+  wxFont font = m_font;
+  
   if (font.IsOk()) {
     dc.SetFont(font);
-    std::string fontNameLabel = "Font: \n\t";
-    fontNameLabel.append(font.GetFaceName());
-    dc.DrawText(fontNameLabel, 5, 5);
-  } else {
-    // Fallback to default font if no font was selected
-    wxFont defaultFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
-    dc.SetFont(defaultFont);
-    dc.DrawText("No font selected :<", 5, 5);
-  }
+    fontNameLabel.append("\n\t" + font.GetFaceName());
+    // wxString faceName = font.GetFaceName();
+    // dc.DrawText(faceName, 5, 15);
+  } 
+  dc.DrawText(fontNameLabel, 5, 5);
 
   // draw a circle
   dc.SetBrush(*wxGREEN_BRUSH); // green filling
@@ -86,14 +84,8 @@ void cDrawPane::render(wxDC& dc) {
   dc.DrawLine( 300, 100, 700, 300 ); // draw line across the rectangle
 }
 
-void cDrawPane::paintNow() {
-  wxClientDC dc(this);
-  render(dc);
-}
-
-void cDrawPane::OnParentFontChanged(wxCommandEvent& event) {
-    // Force repaint when the font changes
-    Refresh();
-    // wxLogMessage("Font changed.");
-    event.Skip(); // Let the event propagate upwards
+wxFont cDrawPane::GetParentFont(wxWindow* parent) {
+  wxFont parentFont = parent->GetFont();
+  return parentFont.IsOk() ? parentFont :
+    wxFont(18, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, true);
 }

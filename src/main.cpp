@@ -1,54 +1,55 @@
-#include "wx/log.h"
 #include "wx/aboutdlg.h"
 #include "wx/event.h"
+#include "wx/filefn.h"
 #include "wx/frame.h"
-#include "wx/fontdata.h"
-#include "wx/gdicmn.h"
+#include "wx/filename.h"
 #include "wx/fontdata.h"
 #include "wx/fontdlg.h"
+#include "wx/gdicmn.h"
+#include "wx/generic/logg.h"
+#include "wx/log.h"
 #include "wx/sizer.h"
+#include "wx/stdpaths.h"
 #include "wx/string.h"
 #include "wx/toolbar.h"
 #include "wx/toplevel.h"
 #include "wx/utils.h"
+#include "wx/config.h"
+#include "wx/fileconf.h"
+#include "wx/msw/regconf.h"
 
 #include "main.hpp"
-#include "ui/cDrawPane.hpp"
-#include "ui/cPanel_Main.hpp"
+#include "events.hpp"
+#include "ui/cNotebook.hpp"
 #include "util/RandGen.hpp"
-#include "ui/cMapPane.hpp"
-
-#include <string>
-
 
 const int ID_FILE_QUIT = wxID_EXIT;
 const int ID_OI_MENU_OI = 1101;
 const int ID_OI_MENU_MMKAY = 1102;
 const int ID_HELP_ABOUT = wxID_ABOUT;
 const int ID_BTN1 = 1001;
-const int ID_BTN2 = 1002;
+const int ID_MSGTEST = 1002;
 const int ID_BTN3 = 1003;
-
-// Custom events
-wxDECLARE_EVENT(FONT_CHANGE_EVENT, wxCommandEvent);
-wxDEFINE_EVENT(FONT_CHANGE_EVENT, wxCommandEvent);
 
 // Event table -- Link event IDs to functions
 wxBEGIN_EVENT_TABLE(cMain, wxFrame)
     EVT_MENU(wxID_EXIT, cMain::OnFileQ)
     EVT_MENU(wxID_ABOUT, cMain::OnAbout)
-    EVT_MENU(ID_OI_MENU_OI, cMain::SayHi)
-    EVT_TOOL(ID_BTN1, cMain::TransformStatusBar)
-    EVT_TOOL(ID_BTN2, cMain::popSB)
     EVT_TOOL(ID_BTN3, cMain::OnChooseFont)
 
 wxEND_EVENT_TABLE()
 
-// cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Raekan", wxDefaultPosition, wxSize(800, 600), wxDEFAULT_FRAME_STYLE) {
 cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Raekan", wxPoint(300,300), wxSize(800, 600), wxDEFAULT_FRAME_STYLE) {
-  m_RandGen = new cRandGen;
 
-   // Set icon from .rc ID
+  // m_config = new wxConfig("Raekan");
+  // wxString font_fromConfig;
+  // if ( m_config->Read("DrawFont", &font_fromConfig) ) {
+  //   wxLogDebug("Config: Using DrawFont from config");
+  //   m_selectedFont = font_fromConfig;
+  // }
+  m_RandGen = new cRandGen;
+  
+  // Set icon from .rc ID
   this->SetIcon(wxICON(APP_ICON));
   // Top-level menu
   wxMenu *fileMenu = new wxMenu;
@@ -84,18 +85,8 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Raekan", wxPoint(300,300), wxSize(8
 
   SetStatusBar(m_mainStatusbar);
 
-  // Book
-  m_book = new wxNotebook(this, -1);
-
-  // Main tabs
-  cPanel_Main* m_panelMain = new cPanel_Main(m_book      );
-  cDrawPane*   m_drawPane  = new cDrawPane(  m_book, this);
-  cMapPane*    m_mapPane   = new cMapPane(   m_book, this);
-
-  // Add tabs to notebook
-  m_book->AddPage(m_panelMain, "Main", true);
-  m_book->AddPage(m_drawPane, "Drawing", false);
-  m_book->AddPage(m_mapPane, "Map", false);
+  // Book (tabs)
+  m_book = new cNotebook(this);
 
   wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
 
@@ -112,7 +103,7 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Raekan", wxPoint(300,300), wxSize(8
                                     _("OIIII"),
                                     _("Some sort of description"));
   // m_mainToolbar->InsertSeparator(1);
-  m_tool2 = m_mainToolbar->AddTool(ID_BTN2, _("Ay"), m_toolIcon2, m_toolIcon2, wxITEM_NORMAL,
+  m_tool2 = m_mainToolbar->AddTool(ID_MSGTEST, _("Ay"), m_toolIcon2, m_toolIcon2, wxITEM_NORMAL,
                                     _("Wööööw"),
                                     _("Longer string here, yes"));
   m_mainToolbar->InsertSeparator(2);
@@ -124,11 +115,21 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Raekan", wxPoint(300,300), wxSize(8
                               _("Toggle a thing"),
                               _("Toggle the thing, I said"));
   m_mainToolbar->Realize();
-  Bind(FONT_CHANGE_EVENT, &cDrawPane::OnParentFontChanged, m_drawPane);
+
+  // TEMPORARY DEBUG LOGGERY
+  wxLogChain* logChain = new wxLogChain(new wxLogStderr);
+  wxLogWindow* logWindow = new wxLogWindow(this, "LOGGERY");
+  wxString logPath = wxStandardPaths::Get().GetUserDir(wxStandardPathsBase::Dir_Documents) + "raekan.log";
+  wxFileName::Mkdir(wxStandardPaths::Get().GetUserDir(wxStandardPathsBase::Dir_Documents),
+                    wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL);
+
+  wxLogStatus("cNotebook's parent: %s", m_book->GetParent()->GetName());
 
 }
 
-cMain::~cMain() {}
+cMain::~cMain() {
+  delete m_config;
+}
 
 void cMain::OnFileQ(wxCommandEvent& WXUNUSED(event)) {
   Close(true);
@@ -145,31 +146,10 @@ void cMain::OnAbout(wxCommandEvent& WXUNUSED(event)) {
   wxAboutBox(info);
 }
 
-void cMain::TransformStatusBar(wxCommandEvent& WXUNUSED(event)) {
-  int seed = m_RandGen->getInt(4242, 9999);
-  wxString str = std::to_string(seed);
-  m_mainStatusbar->PushStatusText(str, 1);
-}
-
-void cMain::popSB(wxCommandEvent& WXUNUSED(event)) {
-  wxString str = m_mainStatusbar->GetStatusText(1);
-  if (str.IsEmpty()) {
-    wxLogStatus(this, "No more status msg on stack");
-    m_mainStatusbar->PushStatusText("Wow.", 1);
-  } else {
-    m_mainStatusbar->PopStatusText(1);
-  }
-}
-
-void cMain::SayHi(wxCommandEvent& WXUNUSED(event)) {
-  wxLogStatus("Hey ho, Silver");
-}
-
 void cMain::OnChooseFont(wxCommandEvent& event) {
   wxFontData fontData;
   fontData.EnableEffects(true);
   fontData.SetInitialFont(wxFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
-
   wxFontDialog fontDialog(this, fontData);
 
   if (fontDialog.ShowModal() == wxID_OK) {
@@ -178,12 +158,17 @@ void cMain::OnChooseFont(wxCommandEvent& event) {
     wxFont font = fontDialog.GetFontData().GetChosenFont();
     m_selectedFont = font;
     wxColour color = fontData.GetColour();
-    wxLogStatus("Selected Font: %s, Color: #%02X%02X%02X",
+    
+    wxLogStatus("Font selected: %s, Colour: #%02X%02X%02X",
                 font.GetFaceName(),
                 color.Red(), color.Green(), color.Blue());
 
-    wxCommandEvent fontChangedEvent(FONT_CHANGE_EVENT);
-    ProcessEvent(fontChangedEvent);
+    // m_config->Write("DrawFont", font.GetFaceName());
+    wxCommandEvent fontEvt(FONT_CHANGE_EVENT);
+    fontEvt.SetEventObject(this);
+    fontEvt.SetClientData(new wxFontData(fontData));
+    wxPostEvent(m_book, fontEvt);
+
   }
 }
 

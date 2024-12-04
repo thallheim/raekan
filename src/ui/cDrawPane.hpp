@@ -4,23 +4,20 @@
 #ifndef WX_PRECOMP
   #include <wx/wx.h>
 #endif
+#include "wx/fontdata.h"
 
-#include "../main.hpp"
-
-class cDrawPane : public wxWindow {
+class cDrawPane : public wxPanel {
 public:
-  cDrawPane(wxWindow* parent, cMain* main);
+  cDrawPane(wxWindow* parent);
   ~cDrawPane();
 
-  void paintEvent(wxPaintEvent & evt);
-  void paintNow();
+  void OnPaint(wxPaintEvent & evt);
 
-  void OnParentFontChanged(wxCommandEvent& event);
+  wxFont GetParentFont(wxWindow* parent);
     
   void render(wxDC& dc);
-    
-private:
-  cMain* m_parent;
 
+private:
+  wxFontData* m_fData;
   DECLARE_EVENT_TABLE();
 };

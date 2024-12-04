@@ -5,22 +5,20 @@
 #ifndef WX_PRECOMP
   #include <wx/wx.h>
 #endif
-
-#include "../main.hpp"
+#include "wx/fontdata.h"
 
 class cMapPane : public wxPanel {
 
 public: 
-  cMapPane(wxWindow* parent, cMain* main);
+  cMapPane(wxWindow* parent);
   ~cMapPane();
 
-  void paintEvent(wxPaintEvent & evt);
-  void paintNow();
+  void OnPaint(wxPaintEvent & evt);
   void render(wxDC& dc);
 
-  void DrawStar(int x, int y, int width, int heigth, wxDC &dc);
+  void DrawStar(int x, int y, int width, int height, wxDC &dc);
+  void setFontData(wxFontData* in);
 private:
-  cMain* m_parent;
-
+  wxFontData* m_fData;
   wxDECLARE_EVENT_TABLE();
 };

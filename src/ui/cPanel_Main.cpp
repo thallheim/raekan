@@ -1,13 +1,12 @@
-#include "wx/log.h"
-#include "wx/translation.h"
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
   #include <wx/wx.h>
 #endif
 
+#include <wx/colour.h>
 #include "wx/event.h"
 #include "wx/gdicmn.h"
-#include <wx/colour.h>
+#include "wx/log.h"
 #include "wx/textctrl.h"
 
 #include "cPanel_Main.hpp"
@@ -27,7 +26,7 @@ cPanel_Main::cPanel_Main(wxWindow* parent)
   m_seed1 = m_rg.getInt(4242, 420042);
   SetBackgroundColour(wxColour(55, 55, 55, 255));
 
-  wxButton* m_buttonQ = new wxButton(this, ID_BTN_NEW_SEED, "New seed", wxPoint(5, 5), wxSize(100, 30));
+  wxButton* m_buttonQ = new wxButton(this, ID_BTN_NEW_SEED, "Random seed", wxPoint(5, 5), wxSize(100, 30));
   wxButton* m_button1 = new wxButton(this, ID_BTN_2, ("Button two"), wxPoint(120, 5), wxSize(100, 30));
   m_seedDisplay = new wxTextCtrl(this, -1, "Seed",  wxPoint(5, 45), wxSize(100,20), wxTE_READONLY | wxTE_LEFT | wxTE_NOHIDESEL | wxTE_RICH2);
 }

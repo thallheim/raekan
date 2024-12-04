@@ -8,6 +8,7 @@
 #include "wx/event.h"
 #include <wx/fontdata.h>
 #include <wx/notebook.h>
+#include "wx/config.h"
 
 class cMain : public wxFrame {
 public:
@@ -37,16 +38,13 @@ public:
   // Handlers
   void OnFileQ(wxCommandEvent& WXUNUSED(event));
   void OnAbout(wxCommandEvent& WXUNUSED(event));
-
-  void OnNewSeed(wxCommandEvent& event);
   void OnChooseFont(wxCommandEvent& event);
-  void TransformStatusBar(wxCommandEvent& WXUNUSED(event));
-  void popSB(wxCommandEvent& WXUNUSED(event));
-  void SayHi(wxCommandEvent& WXUNUSED(event));
-
+  void OnNewSeed(wxCommandEvent& event);
+   
 private:
   cRandGen* m_RandGen;
   int rSeed;
+  wxConfig* m_config;
 
   wxDECLARE_EVENT_TABLE();
 };
