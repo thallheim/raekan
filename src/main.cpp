@@ -1,4 +1,5 @@
 #include "wx/aboutdlg.h"
+#include "wx/confbase.h"
 #include "wx/event.h"
 #include "wx/filefn.h"
 #include "wx/frame.h"
@@ -16,7 +17,6 @@
 #include "wx/utils.h"
 #include "wx/config.h"
 #include "wx/fileconf.h"
-#include "wx/msw/regconf.h"
 
 #include "main.hpp"
 #include "events.hpp"
@@ -40,15 +40,19 @@ wxBEGIN_EVENT_TABLE(cMain, wxFrame)
 wxEND_EVENT_TABLE()
 
 cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Raekan", wxPoint(300,300), wxSize(800, 600), wxDEFAULT_FRAME_STYLE) {
+  m_config = new wxFileConfig("Raekan", "", wxString{}, "", wxCONFIG_USE_LOCAL_FILE);
+  wxConfig::Set(m_config); // Use spec'd conf object globally
 
-  // m_config = new wxConfig("Raekan");
-  // wxString font_fromConfig;
-  // if ( m_config->Read("DrawFont", &font_fromConfig) ) {
-  //   wxLogDebug("Config: Using DrawFont from config");
-  //   m_selectedFont = font_fromConfig;
-  // }
+  // TEMPORARY DEBUG LOGGERY
+  wxLogChain* logChain = new wxLogChain(new wxLogStderr);
+  wxLogWindow* logWindow = new wxLogWindow(this, "LOGGERY");
+  wxString logPath = wxStandardPaths::Get().GetUserDir(wxStandardPathsBase::Dir_Documents) + "raekan.log";
+  wxFileName::Mkdir(wxStandardPaths::Get().GetUserDir(wxStandardPathsBase::Dir_Documents),
+                    wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL);
+
+  // For seed generation
   m_RandGen = new cRandGen;
-  
+
   // Set icon from .rc ID
   this->SetIcon(wxICON(APP_ICON));
   // Top-level menu
@@ -74,9 +78,7 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Raekan", wxPoint(300,300), wxSize(8
   m_mainStatusbar = new wxStatusBar(this, wxID_ANY);
   const int SB_WIDTHS[3] = {-2,-1,100};
   m_mainStatusbar->SetFieldsCount(3, SB_WIDTHS);
-  // m_mainStatusbar->SetStatusText("Very status. Such bar.", 0);
   m_mainStatusbar->PushStatusText("Very status. Such bar.", 0);
-  // m_mainStatusbar->SetStatusText("Wow.", 1);
   m_mainStatusbar->PushStatusText("Wow.", 1);
 
   wxDateTime dt = wxDateTime::Now();
@@ -86,7 +88,9 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Raekan", wxPoint(300,300), wxSize(8
   SetStatusBar(m_mainStatusbar);
 
   // Book (tabs)
-  m_book = new cNotebook(this);
+  m_book = new cNotebook(this, m_config);
+  m_book->Bind(FONT_CHANGE_EVENT, &cNotebook::OnParentFontChanged, m_book);
+  wxLogDebug("Binding FONT_CHANGE_EVENT at: %p", m_book);
 
   wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
 
@@ -115,15 +119,6 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Raekan", wxPoint(300,300), wxSize(8
                               _("Toggle a thing"),
                               _("Toggle the thing, I said"));
   m_mainToolbar->Realize();
-
-  // TEMPORARY DEBUG LOGGERY
-  wxLogChain* logChain = new wxLogChain(new wxLogStderr);
-  wxLogWindow* logWindow = new wxLogWindow(this, "LOGGERY");
-  wxString logPath = wxStandardPaths::Get().GetUserDir(wxStandardPathsBase::Dir_Documents) + "raekan.log";
-  wxFileName::Mkdir(wxStandardPaths::Get().GetUserDir(wxStandardPathsBase::Dir_Documents),
-                    wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL);
-
-  wxLogStatus("cNotebook's parent: %s", m_book->GetParent()->GetName());
 
 }
 
@@ -158,17 +153,18 @@ void cMain::OnChooseFont(wxCommandEvent& event) {
     wxFont font = fontDialog.GetFontData().GetChosenFont();
     m_selectedFont = font;
     wxColour color = fontData.GetColour();
-    
+
     wxLogStatus("Font selected: %s, Colour: #%02X%02X%02X",
                 font.GetFaceName(),
                 color.Red(), color.Green(), color.Blue());
 
-    // m_config->Write("DrawFont", font.GetFaceName());
     wxCommandEvent fontEvt(FONT_CHANGE_EVENT);
     fontEvt.SetEventObject(this);
     fontEvt.SetClientData(new wxFontData(fontData));
     wxPostEvent(m_book, fontEvt);
 
+    // TODO: (Mayhaps) Move to destructor?
+    m_config->Write("/Main/MainAppFont", m_selectedFont);
   }
 }
 

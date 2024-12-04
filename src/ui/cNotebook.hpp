@@ -7,6 +7,7 @@
 
 #include "wx/event.h"
 #include "wx/notebook.h"
+#include "wx/fileconf.h"
 
 #include "cPanel_Main.hpp"
 #include "cDrawPane.hpp"
@@ -14,7 +15,7 @@
 
 class cNotebook : public wxNotebook {
 public:
-  cNotebook(wxWindow* parent);
+  cNotebook(wxWindow* parent, wxFileConfig* config);
   ~cNotebook();
 
   cPanel_Main* m_panel_Main = nullptr;
@@ -25,5 +26,5 @@ public:
   wxFont GetParentFont();
 
 private:
-
+  wxFileConfig* m_config;
 };

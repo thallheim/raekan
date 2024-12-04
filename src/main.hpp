@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ui/cNotebook.hpp"
 #include "util/RandGen.hpp"
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
@@ -9,6 +10,7 @@
 #include <wx/fontdata.h>
 #include <wx/notebook.h>
 #include "wx/config.h"
+#include "wx/fileconf.h"
 
 class cMain : public wxFrame {
 public:
@@ -25,7 +27,7 @@ public:
   wxStatusBar* m_mainStatusbar = nullptr;
 
   // Book
-  wxNotebook* m_book = nullptr;
+  cNotebook* m_book = nullptr;
 
   // Info fields
   wxTextCtrl* m_iField_seed = nullptr;
@@ -44,7 +46,7 @@ public:
 private:
   cRandGen* m_RandGen;
   int rSeed;
-  wxConfig* m_config;
+  wxFileConfig* m_config;
 
   wxDECLARE_EVENT_TABLE();
 };

@@ -24,7 +24,6 @@ cMapPane::cMapPane(wxWindow* parent)
 
 cMapPane::~cMapPane() {}
 
-
 void cMapPane::OnPaint(wxPaintEvent &evt) {
   wxPaintDC dc(this);
   render(dc);
@@ -40,7 +39,6 @@ void cMapPane::render(wxDC& dc) {
                  dc);
   // wxCoord sizeX, sizeY;
   // dc.GetSize(&sizeX, &sizeY);
- 
 }
 
 void cMapPane::setFontData(wxFontData* inputData) {
@@ -48,7 +46,7 @@ void cMapPane::setFontData(wxFontData* inputData) {
 }
 
 void cMapPane::DrawStar(int x, int y, int width, int height, wxDC &dc) {
-  dc.DrawText("Star", dc.FromDIP(x + 10), dc.FromDIP(y + 10));
+  dc.DrawText("Star", dc.FromDIP(x), dc.FromDIP(y-m_font.GetPixelSize().y-1));
   dc.SetClippingRegion(dc.FromDIP(x), dc.FromDIP(y), dc.FromDIP(width), dc.FromDIP(height));
   dc.SetPen(wxPen(*wxBLUE, 1));
   // dc.CrossHair(dc.FromDIP(x + width / 2), dc.FromDIP(y + height / 2));
