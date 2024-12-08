@@ -1,4 +1,6 @@
 #pragma once
+#include <SQLiteCpp/SQLiteCpp.h>
+#include "SQLiteCpp/Database.h"
 
 #include "ui/cNotebook.hpp"
 #include "util/RandGen.hpp"
@@ -44,9 +46,12 @@ public:
   void OnNewSeed(wxCommandEvent& event);
    
 private:
+  SQLite::Database* m_db;
   cRandGen* m_RandGen;
   int rSeed;
   wxFileConfig* m_config;
+
+  bool initDB();
 
   wxDECLARE_EVENT_TABLE();
 };

@@ -1,4 +1,5 @@
 #include "wx/aboutdlg.h"
+#include "wx/app.h"
 #include "wx/confbase.h"
 #include "wx/event.h"
 #include "wx/filefn.h"
@@ -9,6 +10,7 @@
 #include "wx/gdicmn.h"
 #include "wx/generic/logg.h"
 #include "wx/log.h"
+#include "wx/settings.h"
 #include "wx/sizer.h"
 #include "wx/stdpaths.h"
 #include "wx/string.h"
@@ -18,26 +20,49 @@
 #include "wx/config.h"
 #include "wx/fileconf.h"
 
-#include "main.hpp"
 #include "events.hpp"
+#include "main.hpp"
+#include "ui/cLandingPane.hpp"
 #include "ui/cNotebook.hpp"
 #include "util/RandGen.hpp"
 
-const int ID_FILE_QUIT = wxID_EXIT;
-const int ID_OI_MENU_OI = 1101;
-const int ID_OI_MENU_MMKAY = 1102;
-const int ID_HELP_ABOUT = wxID_ABOUT;
-const int ID_BTN1 = 1001;
-const int ID_MSGTEST = 1002;
-const int ID_BTN3 = 1003;
+const int ID_FILE_QUIT            = wxID_EXIT;
+const int ID_OPTIONS_MENU_MENU_OI = 1101;
+const int ID_OPTIONS_MENU_FONT    = 1102;
+const int ID_HELP_MENU_ABOUT      = wxID_ABOUT;
+const int ID_BTN1                 = 1001;
+const int ID_BTN_SHOW_MAIN        = 1002;
+const int ID_BTN3                 = 1003;
 
-// Event table -- Link event IDs to functions
-wxBEGIN_EVENT_TABLE(cMain, wxFrame)
-    EVT_MENU(wxID_EXIT, cMain::OnFileQ)
-    EVT_MENU(wxID_ABOUT, cMain::OnAbout)
-    EVT_TOOL(ID_BTN3, cMain::OnChooseFont)
+
+// #################################################################
+//  ______               _     _        _     _
+// |  ____|             | |   | |      | |   | |
+// | |____   _____ _ __ | |_  | |_ __ _| |__ | | ___  ___
+// |  __\ \ / / _ \ '_ \| __| | __/ _` | '_ \| |/ _ \/ __|
+// | |___\ V /  __/ | | | |_  | || (_| | |_) | |  __/\__ \
+// |______\_/ \___|_| |_|\__|  \__\__,_|_.__/|_|\___||___/
+// #################################################################
+
+wxBEGIN_EVENT_TABLE(cMain, wxFrame) EVT_MENU(wxID_EXIT, cMain::OnFileQ)
+
+EVT_MENU(wxID_ABOUT, cMain::OnAbout)
+EVT_MENU(ID_OPTIONS_MENU_FONT, cMain::OnChooseFont)
+EVT_TOOL(ID_BTN_SHOW_MAIN, cNotebook::OnShowMainPanel)
+EVT_TOOL(ID_BTN3, cMain::OnChooseFont)
 
 wxEND_EVENT_TABLE()
+
+
+
+// #################################################################
+//       __  __       _
+//      |  \/  |     (_)
+//   ___| \  / | __ _ _ _ __
+//  / __| |\/| |/ _` | | '_ \
+// | (__| |  | | (_| | | | | |
+//  \___|_|  |_|\__,_|_|_| |_|
+// #################################################################
 
 cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Raekan", wxPoint(300,300), wxSize(800, 600), wxDEFAULT_FRAME_STYLE) {
   m_config = new wxFileConfig("Raekan", "", wxString{}, "", wxCONFIG_USE_LOCAL_FILE);
@@ -46,35 +71,68 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Raekan", wxPoint(300,300), wxSize(8
   // TEMPORARY DEBUG LOGGERY
   wxLogChain* logChain = new wxLogChain(new wxLogStderr);
   wxLogWindow* logWindow = new wxLogWindow(this, "LOGGERY");
-  wxString logPath = wxStandardPaths::Get().GetUserDir(wxStandardPathsBase::Dir_Documents) + "raekan.log";
-  wxFileName::Mkdir(wxStandardPaths::Get().GetUserDir(wxStandardPathsBase::Dir_Documents),
-                    wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL);
+  // wxString logPath = wxStandardPaths::Get().GetUserDir(wxStandardPathsBase::Dir_Documents) + "raekan.log";
+  // wxFileName::Mkdir(wxStandardPaths::Get().GetUserDir(wxStandardPathsBase::Dir_Documents),
+  //                  wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL);
+
+  // Write dir paths to config
+  wxString uD = wxStandardPaths::Get().GetUserDir(wxStandardPathsBase::Dir_Documents);
+  wxString aD;
+  wxGetEnv("APPDATA", &aD);
+  m_config->Write("/UserDirs/AppDataDir", aD);
+  m_config->Write("/UserDirs/DocsDir", uD);
+
+  // DB
+  initDB();
 
   // For seed generation
   m_RandGen = new cRandGen;
 
   // Set icon from .rc ID
   this->SetIcon(wxICON(APP_ICON));
+
+  // #################################################################
+  //  __  __
+  // |  \/  |
+  // | \  / | ___ _ __  _   _ ___
+  // | |\/| |/ _ \ '_ \| | | / __|
+  // | |  | |  __/ | | | |_| \__ \
+  // |_|  |_|\___|_| |_|\__,_|___/
+  // #################################################################
+
   // Top-level menu
   wxMenu *fileMenu = new wxMenu;
-  wxMenu *oiMenu = new wxMenu;
-  wxMenu *helpMenu = new wxMenu;
+  fileMenu->AppendSeparator();
   fileMenu->AppendSeparator();
   fileMenu->Append(ID_FILE_QUIT, ("Exit\tAlt-X"),
                    ("Quit like a coward"), ("Flee in fear and shame"));
-  oiMenu->Append(ID_OI_MENU_OI, ("&Oi"), ("Oi oi"));
-  fileMenu->AppendSeparator();
-  oiMenu->Append(ID_FILE_QUIT, ("&Mmkay"), ("Bai"));
+
+  wxMenu *optionsMenu = new wxMenu;
+  optionsMenu->Append(ID_FILE_QUIT, ("&Mmkay"), ("Bai"));
+
+  wxMenu *options_Fonts_Menu = new wxMenu;
+  options_Fonts_Menu->Append(ID_OPTIONS_MENU_FONT, ("&Primary font"), ("Set primary font"));
+  optionsMenu->AppendSubMenu(options_Fonts_Menu, "&Fonts");
+
+  wxMenu *helpMenu = new wxMenu;
   helpMenu->AppendSeparator();
-  helpMenu->Append(ID_HELP_ABOUT, ("About...\tF1"),
+  helpMenu->Append(ID_HELP_MENU_ABOUT, ("About...\tF1"),
                    ("a boot"));
   wxMenuBar *menuBar = new wxMenuBar();
   menuBar->Append(fileMenu, _T("&File"));
-  menuBar->Append(oiMenu, _T("&Oi"));
+  menuBar->Append(optionsMenu, _T("&Options"));
   menuBar->Append(helpMenu, _T("&Help"));
   SetMenuBar(menuBar);
 
-  // Status bar
+  // #################################################################
+  //    _____ _        _               _
+  //  / ____| |      | |             | |
+  // ( (___ | |_ __ _| |_ _   _ ___  | |__   __ _ _ __
+  // \____ \| __/ _` | __| | | / __| | '_ \ / _` | '__|
+  //  ____) | || (_| | |_| |_| \__ \ | |_) | (_| | |
+  // |_____/ \__\__,_|\__|\__,_|___/ |_.__/ \__,_|_|
+  // #################################################################
+
   m_mainStatusbar = new wxStatusBar(this, wxID_ANY);
   const int SB_WIDTHS[3] = {-2,-1,100};
   m_mainStatusbar->SetFieldsCount(3, SB_WIDTHS);
@@ -87,17 +145,36 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Raekan", wxPoint(300,300), wxSize(8
 
   SetStatusBar(m_mainStatusbar);
 
-  // Book (tabs)
+// #################################################################
+//   _   _       _       _                 _
+//  | \ | |     | |     | |               | |
+//  |  \| | ___ | |_ ___| |__   ___   ___ | | __
+//  | . ` |/ _ \| __/ _ \ '_ \ / _ \ / _ \| |/ /
+//  | |\  | (_) | ||  __/ |_) | (_) | (_) |   <
+//  |_| \_|\___/ \__\___|_.__/ \___/ \___/|_|\_\
+// #################################################################
+
   m_book = new cNotebook(this, m_config);
   m_book->Bind(FONT_CHANGE_EVENT, &cNotebook::OnParentFontChanged, m_book);
-  wxLogDebug("Binding FONT_CHANGE_EVENT at: %p", m_book);
+  /* TODO: Why or why not bind here instead of in the child pane's constructor? */
+  // m_book->Bind(EVT_ON_SHOW_MAIN, &cLandingPane::OnButtonTwo, m_book);
+  wxLogDebug("cMain: Binding FONT_CHANGE_EVENT at: %p", m_book);
+  wxLogDebug("cMain: Notebook ID: %d", this->GetId());
 
   wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
 
   mainSizer->Add(m_book, 1, wxEXPAND | wxALL, 0);
   SetSizer(mainSizer);
 
-  // Toolbar
+// #################################################################
+//   _______          _ _
+//  |__   __|        | | |
+//     | | ___   ___ | | |__   __ _ _ __
+//     | |/ _ \ / _ \| | '_ \ / _` | '__|
+//     | | (_) | (_) | | |_) | (_| | |
+//     |_|\___/ \___/|_|_.__/ \__,_|_|
+// #################################################################
+
   static const long TB_SYLES = wxTB_FLAT | wxTB_DOCKABLE | wxTB_HORZ_TEXT;
   m_mainToolbar = this->CreateToolBar(TB_SYLES, -1);
   m_mainToolbar->SetMargins(1,1);
@@ -107,9 +184,9 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Raekan", wxPoint(300,300), wxSize(8
                                     _("OIIII"),
                                     _("Some sort of description"));
   // m_mainToolbar->InsertSeparator(1);
-  m_tool2 = m_mainToolbar->AddTool(ID_MSGTEST, _("Ay"), m_toolIcon2, m_toolIcon2, wxITEM_NORMAL,
-                                    _("Wööööw"),
-                                    _("Longer string here, yes"));
+  m_tool2 = m_mainToolbar->AddTool(ID_BTN_SHOW_MAIN, _("Show 'Main'"), m_toolIcon2, m_toolIcon2, wxITEM_NORMAL,
+                                    _("Show 'Main' panel"),
+                                    _("Just try the damn button"));
   m_mainToolbar->InsertSeparator(2);
   m_tool3 = m_mainToolbar->AddTool(ID_BTN3, "Font sel.", m_toolIcon2, m_toolIcon2, wxITEM_NORMAL,
                                    _("Select font"),
@@ -119,6 +196,7 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Raekan", wxPoint(300,300), wxSize(8
                               _("Toggle a thing"),
                               _("Toggle the thing, I said"));
   m_mainToolbar->Realize();
+
 
 }
 
@@ -144,7 +222,8 @@ void cMain::OnAbout(wxCommandEvent& WXUNUSED(event)) {
 void cMain::OnChooseFont(wxCommandEvent& event) {
   wxFontData fontData;
   fontData.EnableEffects(true);
-  fontData.SetInitialFont(wxFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
+  // fontData.SetInitialFont(wxFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
+  fontData.SetInitialFont(m_config->Read("/Main/MainAppFont"));
   wxFontDialog fontDialog(this, fontData);
 
   if (fontDialog.ShowModal() == wxID_OK) {
@@ -165,10 +244,25 @@ void cMain::OnChooseFont(wxCommandEvent& event) {
 
     // TODO: (Mayhaps) Move to destructor?
     m_config->Write("/Main/MainAppFont", m_selectedFont);
+    wxLogDebug("Wrote new font to config");
   }
 }
 
 wxFont cMain::getSelectedFont() {
   return m_selectedFont.IsOk() ? m_selectedFont :
     wxFont(18, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, true);
+}
+
+bool cMain::initDB() {
+  try {
+    wxString aD = m_config->Read("/UserDirs/AppDataDir");
+    wxString dbPath = aD + "/raekan_test.db3";
+    SQLite::Database db(dbPath, SQLite::OPEN_READWRITE|SQLite::OPEN_CREATE);
+
+    return true;
+
+} catch (std::exception& e) {
+    wxLogError("ERROR: Init/open db failed: \n -- %s", e.what());
+  }
+  return false;
 }

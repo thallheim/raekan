@@ -34,18 +34,25 @@ void cMapPane::render(wxDC& dc) {
   wxFont font = m_font;
   if (font.IsOk()) { dc.SetFont(font); }
 
-  this->DrawStar(dc.FromDIP(25), dc.FromDIP(300),
+  this->DrawCross(dc.FromDIP(25), dc.FromDIP(300),
                  dc.FromDIP(50), dc.FromDIP(50),
                  dc);
-  // wxCoord sizeX, sizeY;
-  // dc.GetSize(&sizeX, &sizeY);
+  
+  auto ogPen = dc.GetPen();
+  dc.SetPen(*wxWHITE_PEN);
+  dc.DrawPoint(10,10);
+
+  dc.SetPen(ogPen);
+
 }
 
-void cMapPane::setFontData(wxFontData* inputData) {
-  m_fData = inputData;
+void cMapPane::setFontData(wxFontData *inputData) { m_fData = inputData; }
+
+void cMapPane::drawStar(int posX, int posY, int radius, wxDC &dc) {
+  
 }
 
-void cMapPane::DrawStar(int x, int y, int width, int height, wxDC &dc) {
+void cMapPane::DrawCross(int x, int y, int width, int height, wxDC &dc) {
   dc.DrawText("Star", dc.FromDIP(x), dc.FromDIP(y-m_font.GetPixelSize().y-1));
   dc.SetClippingRegion(dc.FromDIP(x), dc.FromDIP(y), dc.FromDIP(width), dc.FromDIP(height));
   dc.SetPen(wxPen(*wxBLUE, 1));

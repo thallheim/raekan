@@ -1,3 +1,4 @@
+#include "wx/brush.h"
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
   #include <wx/wx.h>
@@ -55,33 +56,54 @@ void cDrawPane::OnPaint(wxPaintEvent & evt) {
 
 void cDrawPane::render(wxDC& dc) {
   // draw some text
+  // dc.SetTextBackground(wxColour(15,65,112,255));
   dc.SetTextBackground(*wxLIGHT_GREY);
-  dc.SetTextForeground(wxColour(0,50,200,255));
+  dc.SetBackgroundMode(wxBRUSHSTYLE_SOLID);
+  // dc.SetTextForeground(wxColour(255,140,0,255));
+  dc.SetTextForeground(wxColour(15,65,112,255));
 
-  std::string fontNameLabel = "Font:";
+  std::string fontNameLabel = "Font: ";
   wxFont font = m_font;
   
   if (font.IsOk()) {
     dc.SetFont(font);
-    fontNameLabel.append("\n\t" + font.GetFaceName());
+    fontNameLabel.append(font.GetFaceName());
     // wxString faceName = font.GetFaceName();
     // dc.DrawText(faceName, 5, 15);
   } 
   dc.DrawText(fontNameLabel, 5, 5);
+  dc.SetBackgroundMode(wxBRUSHSTYLE_TRANSPARENT);
 
   // draw a circle
-  dc.SetBrush(*wxGREEN_BRUSH); // green filling
-  dc.SetPen( wxPen( wxColor(255,0,0), 5 ) ); // 5-pixels-thick red outline
+  wxBrush bCircle;
+  bCircle.SetColour(0,200,35);
+  dc.SetBrush(bCircle);
+  wxPen pCircle;
+  pCircle.SetColour(255,0,0);
+  pCircle.SetWidth(3);
+  dc.SetPen( wxPen(pCircle));
   dc.DrawCircle( wxPoint(200,100), 25 /* radius */ );
 
   // draw a rectangle
-  dc.SetBrush(*wxBLUE_BRUSH); // blue filling
-  dc.SetPen( wxPen( wxColor(255,175,175), 10 ) ); // 10-pixels-thick pink outline
+  wxBrush bRect;
+  bRect.SetColour(80,80,80);
+  dc.SetBrush(bRect);
+  dc.SetPen( wxPen( wxColor(255,175,175), 10)); // 10-pixels-thick pink outline
   dc.DrawRectangle( 300, 100, 400, 200 );
 
   // draw a line
   dc.SetPen( wxPen( wxColor(0,0,0), 3 ) ); // black line, 3 pixels thick
   dc.DrawLine( 300, 100, 700, 300 ); // draw line across the rectangle
+
+  auto ogBrush = dc.GetBrush();
+  auto ogPen = dc.GetPen();
+  dc.SetBrush(*wxTRANSPARENT_BRUSH);
+  dc.SetPen(*wxWHITE_PEN);
+  dc.DrawArc(20,20,100,100,50,50);
+
+  dc.SetPen(ogPen);
+  dc.SetBrush(ogBrush);
+
 }
 
 wxFont cDrawPane::GetParentFont(wxWindow* parent) {

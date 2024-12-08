@@ -9,6 +9,7 @@
 #include "wx/notebook.h"
 #include "wx/fileconf.h"
 
+#include "cLandingPane.hpp"
 #include "cPanel_Main.hpp"
 #include "cDrawPane.hpp"
 #include "cMapPane.hpp"
@@ -18,13 +19,18 @@ public:
   cNotebook(wxWindow* parent, wxFileConfig* config);
   ~cNotebook();
 
-  cPanel_Main* m_panel_Main = nullptr;
-  cDrawPane*   m_drawPane   = nullptr;
-  cMapPane*    m_mapPane    = nullptr;
+  cLandingPane*  m_landingPane   = nullptr;
+  cPanel_Main*   m_mainPanel     = nullptr;
+  cDrawPane*     m_drawPane      = nullptr;
+  cMapPane*      m_mapPane       = nullptr;
 
   void OnParentFontChanged(wxCommandEvent& event);
+  void OnShowMainPanel(wxCommandEvent& WXUNUSED(event));
   wxFont GetParentFont();
 
 private:
   wxFileConfig* m_config;
+
+  void hideMainTab(wxWindow* parent);
+  void disableMainTab(wxWindow* parent);
 };

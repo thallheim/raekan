@@ -10,6 +10,8 @@ find_package(wxWidgets REQUIRED COMPONENTS net core base)
 if(wxWidgets_USE_FILE)
   include(${wxWidgets_USE_FILE})
 endif()
+find_package(SQLiteCpp REQUIRED)
+# find_package(libpqxx REQUIRED)
 
 
 set(APP_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/resources.rc")
@@ -25,5 +27,7 @@ add_executable(${PROJECT_NAME} ${APP_RESOURCES} ${SRC})
 
 target_link_libraries(${PROJECT_NAME}
   ${wxWidgets_LIBRARIES}
+  SQLiteCpp
+  # libpqxx::pqxx
 )
 set_target_properties(${PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)

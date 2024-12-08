@@ -22,5 +22,6 @@ like it.
 ---
 # TODO
 
-* [ ] Add random distrib of something to map pane
-* [ ] Make map pannable
+  * [ ] Sort out having 'Main' notebook pane hidden/disabled at startup
+      - Something's wrong atm: pagecounts showing random bits
+  - [ ] `cLandingPane`: What should go on it?

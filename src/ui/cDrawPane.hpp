@@ -12,10 +12,9 @@ public:
   ~cDrawPane();
 
   void OnPaint(wxPaintEvent & evt);
+  void render(wxDC& dc);
 
   wxFont GetParentFont(wxWindow* parent);
-    
-  void render(wxDC& dc);
 
 private:
   wxFontData* m_fData;

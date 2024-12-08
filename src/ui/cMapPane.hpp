@@ -16,9 +16,13 @@ public:
   void OnPaint(wxPaintEvent & evt);
   void render(wxDC& dc);
 
-  void DrawStar(int x, int y, int width, int height, wxDC &dc);
+  void DrawCross(int x, int y, int width, int height, wxDC &dc);
   void setFontData(wxFontData* in);
+  void drawStar(int posX, int posY, int radius, wxDC &dc);
+  
 private:
   wxFontData* m_fData;
+  wxBrush* m_activeBrush;
+  
   wxDECLARE_EVENT_TABLE();
 };
