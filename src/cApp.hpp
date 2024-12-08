@@ -13,7 +13,9 @@ public:
   ~cApp();
 
 private:
+
   cMain *m_frameA1 = nullptr;
 
+  bool initDB();
   virtual bool OnInit();
 };
