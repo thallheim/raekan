@@ -24,4 +24,19 @@ like it.
 
   * [ ] Sort out having 'Main' notebook pane hidden/disabled at startup
       - Something's wrong atm: pagecounts showing random bits
-  - [ ] `cLandingPane`: What should go on it?
+  - [ ] Start HTML stuff
+    - [ ] File loader
+    - [ ] Preview pane (scrollable-derived)
+
+## Landing
+
+Need to decide how to handle an extant site, and what I should implement first.
+
+  - [ ] Site loader (from DB file)
+  - [ ] Checkboxes for if stuff was found (css/scss, templates dir, etc) at chosen site root
+
+## DB
+
+Text-only, to start.
+
+  * [ ] Suss out serialising a bare HTML/CSS-only site dir
