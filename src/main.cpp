@@ -26,33 +26,39 @@
 #include "ui/cNotebook.hpp"
 #include "util/RandGen.hpp"
 
-const int ID_FILE_QUIT            = wxID_EXIT;
-const int ID_OPTIONS_MENU_MENU_OI = 1101;
-const int ID_OPTIONS_MENU_FONT    = 1102;
-const int ID_HELP_MENU_ABOUT      = wxID_ABOUT;
-const int ID_BTN1                 = 1001;
-const int ID_BTN_SHOW_MAIN        = 1002;
-const int ID_BTN3                 = 1003;
-
 
 // #################################################################
-//  ______               _     _        _     _
-// |  ____|             | |   | |      | |   | |
-// | |____   _____ _ __ | |_  | |_ __ _| |__ | | ___  ___
-// |  __\ \ / / _ \ '_ \| __| | __/ _` | '_ \| |/ _ \/ __|
-// | |___\ V /  __/ | | | |_  | || (_| | |_) | |  __/\__ \
-// |______\_/ \___|_| |_|\__|  \__\__,_|_.__/|_|\___||___/
+//  ______               _   
+// |  ____|             | |  
+// | |____   _____ _ __ | |_  ___
+// |  __\ \ / / _ \ '_ \| __|/ __|
+// | |___\ V /  __/ | | | |_ \__ \
+// |______\_/ \___|_| |_|\__||___/
 // #################################################################
 
+// Evt IDs
+enum {
+  // Main menu bar
+  ID_FILEMENU_QUIT = wxID_EXIT,
+  ID_HELPMENU_ABOUT = wxID_ABOUT,
+  ID_OPTIONSMENU_MENU_MMKAY = wxID_HIGHEST,
+  ID_OPTIONSMENU_FONT,
+
+  // Toolbar buttons
+  ID_TOOLBAR_BTN1,
+  ID_TOOLBAR_BTN_SHOW_MAIN,
+  ID_TOOLBAR_BTN3,
+};
+
+// Evt table
 wxBEGIN_EVENT_TABLE(cMain, wxFrame) EVT_MENU(wxID_EXIT, cMain::OnFileQ)
 
 EVT_MENU(wxID_ABOUT, cMain::OnAbout)
-EVT_MENU(ID_OPTIONS_MENU_FONT, cMain::OnChooseFont)
-EVT_TOOL(ID_BTN_SHOW_MAIN, cNotebook::OnShowMainPanel)
-EVT_TOOL(ID_BTN3, cMain::OnChooseFont)
+EVT_MENU(ID_OPTIONSMENU_FONT, cMain::OnChooseFont)
+EVT_TOOL(ID_TOOLBAR_BTN_SHOW_MAIN, cNotebook::OnShowMainPanel)
+EVT_TOOL(ID_TOOLBAR_BTN3, cMain::OnChooseFont)
 
 wxEND_EVENT_TABLE()
-
 
 
 // #################################################################
@@ -104,19 +110,19 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Raekan", wxPoint(300,300), wxSize(8
   wxMenu *fileMenu = new wxMenu;
   fileMenu->AppendSeparator();
   fileMenu->AppendSeparator();
-  fileMenu->Append(ID_FILE_QUIT, ("Exit\tAlt-X"),
+  fileMenu->Append(ID_FILEMENU_QUIT, ("Exit\tAlt-X"),
                    ("Quit like a coward"), ("Flee in fear and shame"));
 
   wxMenu *optionsMenu = new wxMenu;
-  optionsMenu->Append(ID_FILE_QUIT, ("&Mmkay"), ("Bai"));
+  optionsMenu->Append(ID_FILEMENU_QUIT, ("&Mmkay"), ("Bai"));
 
   wxMenu *options_Fonts_Menu = new wxMenu;
-  options_Fonts_Menu->Append(ID_OPTIONS_MENU_FONT, ("&Primary font"), ("Set primary font"));
+  options_Fonts_Menu->Append(ID_OPTIONSMENU_FONT, ("&Primary font"), ("Set primary font"));
   optionsMenu->AppendSubMenu(options_Fonts_Menu, "&Fonts");
 
   wxMenu *helpMenu = new wxMenu;
   helpMenu->AppendSeparator();
-  helpMenu->Append(ID_HELP_MENU_ABOUT, ("About...\tF1"),
+  helpMenu->Append(ID_HELPMENU_ABOUT, ("About...\tF1"),
                    ("a boot"));
   wxMenuBar *menuBar = new wxMenuBar();
   menuBar->Append(fileMenu, _T("&File"));
@@ -175,24 +181,24 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Raekan", wxPoint(300,300), wxSize(8
 //     |_|\___/ \___/|_|_.__/ \__,_|_|
 // #################################################################
 
-  static const long TB_SYLES = wxTB_FLAT | wxTB_DOCKABLE | wxTB_HORZ_TEXT;
-  m_mainToolbar = this->CreateToolBar(TB_SYLES, -1);
+  static const long TB_STYLES = wxTB_FLAT | wxTB_HORZ_TEXT;
+  m_mainToolbar = this->CreateToolBar(TB_STYLES, wxID_ANY);
   m_mainToolbar->SetMargins(1,1);
   wxIcon m_toolIcon(wxICON(TOOL_DOGE));
   wxIcon m_toolIcon2(wxICON(TOOL_DOGE2));
-  m_tool1 = m_mainToolbar->AddTool( ID_BTN1, _("oi"), m_toolIcon, m_toolIcon, wxITEM_NORMAL,
+  m_tool1 = m_mainToolbar->AddTool( ID_TOOLBAR_BTN1, _("oi"), m_toolIcon, m_toolIcon, wxITEM_NORMAL,
                                     _("OIIII"),
                                     _("Some sort of description"));
   // m_mainToolbar->InsertSeparator(1);
-  m_tool2 = m_mainToolbar->AddTool(ID_BTN_SHOW_MAIN, _("Show 'Main'"), m_toolIcon2, m_toolIcon2, wxITEM_NORMAL,
+  m_tool2 = m_mainToolbar->AddTool(ID_TOOLBAR_BTN_SHOW_MAIN, _("Show 'Main'"), m_toolIcon2, m_toolIcon2, wxITEM_NORMAL,
                                     _("Show 'Main' panel"),
                                     _("Just try the damn button"));
   m_mainToolbar->InsertSeparator(2);
-  m_tool3 = m_mainToolbar->AddTool(ID_BTN3, "Font sel.", m_toolIcon2, m_toolIcon2, wxITEM_NORMAL,
+  m_tool3 = m_mainToolbar->AddTool(ID_TOOLBAR_BTN3, "Font sel.", m_toolIcon2, m_toolIcon2, wxITEM_NORMAL,
                                    _("Select font"),
                                    _("SELECT FONT"));
   m_mainToolbar->AddStretchableSpace();
-  m_mainToolbar->AddCheckTool(ID_BTN3, _("Toggle"), m_toolIcon, m_toolIcon2,
+  m_mainToolbar->AddCheckTool(ID_TOOLBAR_BTN3, _("Toggle"), m_toolIcon, m_toolIcon2,
                               _("Toggle a thing"),
                               _("Toggle the thing, I said"));
   m_mainToolbar->Realize();
@@ -223,7 +229,7 @@ void cMain::OnChooseFont(wxCommandEvent& event) {
   wxFontData fontData;
   fontData.EnableEffects(true);
   // fontData.SetInitialFont(wxFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
-  fontData.SetInitialFont(m_config->Read("/Main/MainAppFont"));
+  fontData.SetInitialFont(m_config->Read("/Fonts/MainAppFont"));
   wxFontDialog fontDialog(this, fontData);
 
   if (fontDialog.ShowModal() == wxID_OK) {
@@ -243,7 +249,7 @@ void cMain::OnChooseFont(wxCommandEvent& event) {
     wxPostEvent(m_book, fontEvt);
 
     // TODO: (Mayhaps) Move to destructor?
-    m_config->Write("/Main/MainAppFont", m_selectedFont);
+    m_config->Write("/Fonts/MainAppFont", m_selectedFont);
     wxLogDebug("Wrote new font to config");
   }
 }
