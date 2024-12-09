@@ -1,5 +1,6 @@
 #pragma once
 
+#include "wx/rtti.h"
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
   #include <wx/wx.h>
@@ -24,13 +25,15 @@ public:
   cDrawPane*     m_drawPane      = nullptr;
   cMapPane*      m_mapPane       = nullptr;
 
+  bool           m_mainPaneEnabled = false;
+
   void OnParentFontChanged(wxCommandEvent& event);
   void OnShowMainPanel(wxCommandEvent& WXUNUSED(event));
   wxFont GetParentFont();
+  void GetNumPages(wxCommandEvent& event);
 
 private:
   wxFileConfig* m_config;
+  int dm_mainPaneID = 0;
 
-  void hideMainTab(wxWindow* parent);
-  void disableMainTab(wxWindow* parent);
 };
