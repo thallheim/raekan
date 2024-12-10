@@ -22,21 +22,24 @@ like it.
 ---
 # TODO
 
-  * [ ] Sort out having 'Main' notebook pane hidden/disabled at startup
-      - Something's wrong atm: pagecounts showing random bits
-  - [ ] Start HTML stuff
-    - [ ] File loader
-    - [ ] Preview pane (scrollable-derived)
+* [ ] Config manager
+* [ ] Sort out having 'Main' notebook pane hidden/disabled at startup
+    - Something's wrong atm: pagecounts showing random bits
+- [ ] Start HTML stuff
+  - [ ] File loader
+  - [ ] Preview pane (scrollable-derived)
 
 ## Landing
 
 Need to decide how to handle an extant site, and what I should implement first.
 
   - [ ] Site loader (from DB file)
-  - [ ] Checkboxes for if stuff was found (css/scss, templates dir, etc) at chosen site root
+  - [ ] Info boxes for if stuff was found (css/scss, templates dir, etc) at chosen site root
+        _Started_
 
 ## DB
 
 Text-only, to start.
 
   * [ ] Suss out serialising a bare HTML/CSS-only site dir
+  * [ ] Start a DB handler class
