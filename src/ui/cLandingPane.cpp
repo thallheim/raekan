@@ -3,8 +3,10 @@
   #include <wx/wx.h>
 #endif
 
-#include <wx/colour.h>
+#include "wx/checkbox.h"
+#include "wx/colour.h"
 #include "wx/event.h"
+#include <wx/gbsizer.h>
 #include "wx/gdicmn.h"
 #include "wx/log.h"
 #include "wx/sizer.h"
@@ -14,33 +16,62 @@
 #include "cLandingPane.hpp"
 #include "../util/RandGen.hpp"
 
-const int ID_BTN_NEW_SEED = 11001;
-const int ID_BTN_2        = 11002;
+enum {
+  // Prop grid
+  ID_PGRID,
+  // Buttons
+  ID_BTN_NEW_SEED = wxID_HIGHEST,
+  ID_BTN_2
+};
+
+
 
 cLandingPane::cLandingPane(wxWindow* parent)
   : wxPanel(parent, wxID_ANY), m_parent(parent) {
 
   m_seed1 = m_rg.getInt(4242, 420042);
   SetBackgroundColour(wxColour(55, 55, 55, 255));
+  auto oldCol = GetForegroundColour();
+  SetForegroundColour(wxColour(255,255,255,255));
 
   wxBoxSizer* rootSizer = new wxBoxSizer(wxVERTICAL);
   SetSizer(rootSizer);
-  // rootSizer->SetSizeHints(this);
-  rootSizer->Layout();
+  rootSizer->SetSizeHints(this);
 
-  wxBoxSizer* btnSizer = new wxBoxSizer(wxHORIZONTAL);
-  wxButton* m_button_newSeed = new wxButton(this, ID_BTN_NEW_SEED, "Random seed");
-  wxButton* m_button_two = new wxButton(this, ID_BTN_2, ("Button two"));
-  m_seedDisplay = new wxTextCtrl(this, -1, "Seed",  wxPoint(5, 45), wxSize(100,20), wxTE_READONLY | wxTE_LEFT | wxTE_NOHIDESEL | wxTE_RICH2);
+  // FIXME: Solve imports. Won't link even with propgrid.h included.
+  //
+  /* wxPropertyGrid* pg = new wxPropertyGrid(this, ID_PGRID, wxDefaultPosition, wxDefaultSize,
+                                          wxPG_AUTO_SORT | wxPG_SPLITTER_AUTO_CENTER | wxPG_DEFAULT_STYLE );
+  pg->Append( new wxStringProperty("TestLabel", "TestName", "TestVal") );
+  rootSizer->Add(pg, wxEXPAND); */
 
-  btnSizer->Add(m_button_newSeed);
-  btnSizer->Add(m_button_two);
-  rootSizer->Add(btnSizer);
-  rootSizer->Add(m_seedDisplay);
 
-  // Bindings
-  m_button_newSeed->Bind( wxEVT_BUTTON, &cLandingPane::OnNewSeed,   this);
-  m_button_two->Bind(     wxEVT_BUTTON, &cLandingPane::OnButtonTwo, this);
+  // Info panels
+  wxFlexGridSizer* fgSzr;
+  fgSzr = new wxFlexGridSizer(0, 2, 5, 5);
+  fgSzr->AddGrowableCol(0);
+  fgSzr->AddGrowableCol(1);
+  fgSzr->SetFlexibleDirection(wxBOTH);
+  fgSzr->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+  wxStaticBoxSizer* iBoxSzr1;
+  iBoxSzr1 = new wxStaticBoxSizer(new wxStaticBox(this, wxID_ANY, _("Status")), wxVERTICAL);
+
+  auto iBox1_text = new wxStaticText(iBoxSzr1->GetStaticBox(), wxID_ANY, _("I am text."), wxDefaultPosition, wxDefaultSize, 0);
+  iBox1_text->Wrap(-1);
+  iBoxSzr1->Add(iBox1_text, 0, wxALL, 5);
+
+  fgSzr->Add(iBoxSzr1, 2, wxEXPAND, 5);
+
+  wxStaticBoxSizer* iBoxSzr2;
+  iBoxSzr2 = new wxStaticBoxSizer(new wxStaticBox(this, wxID_ANY, _("Database")), wxVERTICAL);
+
+  fgSzr->Add(iBoxSzr2, 1, wxEXPAND, 5);
+  wxPanel* bigPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
+  rootSizer->Add(fgSzr, 1, wxEXPAND, 5);
+  rootSizer->Add(bigPanel, 3, wxEXPAND | wxALL, 5);
+
+
 }
 
 cLandingPane::~cLandingPane() {}
