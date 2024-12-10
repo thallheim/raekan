@@ -74,6 +74,13 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Raekan", wxPoint(300,300), wxSize(8
   m_config = new wxFileConfig("Raekan", "", wxString{}, "", wxCONFIG_USE_LOCAL_FILE);
   wxConfig::Set(m_config); // Use spec'd conf object globally
 
+  wxFont currFont = wxFont(m_config->Read("/Fonts/MainAppFont"));
+  currFont.SetPointSize(10);
+  wxFont newFont = GetFont();
+  newFont.SetFaceName(currFont.GetFaceName());
+  this->SetFont(currFont);
+  
+  
   // TEMPORARY DEBUG LOGGERY
   wxLogChain* logChain = new wxLogChain(new wxLogStderr);
   wxLogWindow* logWindow = new wxLogWindow(this, "LOGGERY");
@@ -89,7 +96,7 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Raekan", wxPoint(300,300), wxSize(8
   m_config->Write("/UserDirs/DocsDir", uD);
 
   // DB
-  initDB();
+  //initDB();
 
   // For seed generation
   m_RandGen = new cRandGen;
@@ -202,7 +209,6 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Raekan", wxPoint(300,300), wxSize(8
                               _("Toggle a thing"),
                               _("Toggle the thing, I said"));
   m_mainToolbar->Realize();
-
 
 }
 
