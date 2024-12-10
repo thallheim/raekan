@@ -1,7 +1,9 @@
+#include <wx/config.h>
 #include <wx/log.h>
 #include <wx/event.h>
 
 #include "cMapPane.hpp"
+#include "wx/fileconf.h"
 #include "wx/gdicmn.h"
 #include "wx/sizer.h"
 
@@ -11,9 +13,14 @@ wxBEGIN_EVENT_TABLE(cMapPane, wxPanel)
 wxEND_EVENT_TABLE()
 
 
+// cMapPane::cMapPane(wxWindow* parent, wxFileConfig* config)
+// : wxPanel(parent, -1), m_config(config) {
 cMapPane::cMapPane(wxWindow* parent)
 : wxPanel(parent, -1) {
   SetBackgroundColour(*wxBLACK);
+
+
+
 
   wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
   // wxPanel* panel = new wxPanel(this, -1);
@@ -31,8 +38,6 @@ void cMapPane::OnPaint(wxPaintEvent &evt) {
 
 void cMapPane::render(wxDC& dc) {
   dc.SetTextForeground(wxColour(245,170,5,255));
-  wxFont font = m_font;
-  if (font.IsOk()) { dc.SetFont(font); }
 
   this->DrawCross(dc.FromDIP(25), dc.FromDIP(300),
                  dc.FromDIP(50), dc.FromDIP(50),

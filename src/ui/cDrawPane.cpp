@@ -1,13 +1,13 @@
-#include "wx/brush.h"
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
   #include <wx/wx.h>
 #endif
+#include "wx/brush.h"
+#include "wx/event.h"
 #include "wx/font.h"
 #include "wx/fontdata.h"
-#include "wx/log.h"
-#include "wx/event.h"
 #include "wx/gdicmn.h"
+#include "wx/log.h"
 
 #include "cDrawPane.hpp"
 

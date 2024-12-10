@@ -1,6 +1,7 @@
 #pragma once
 
 #include "wx/event.h"
+#include "wx/fileconf.h"
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
   #include <wx/wx.h>
@@ -10,6 +11,7 @@
 class cMapPane : public wxPanel {
 
 public: 
+  // cMapPane(wxWindow* parent, wxFileConfig* config);
   cMapPane(wxWindow* parent);
   ~cMapPane();
 
@@ -21,6 +23,7 @@ public:
   void drawStar(int posX, int posY, int radius, wxDC &dc);
   
 private:
+  wxFileConfig* m_config;
   wxFontData* m_fData;
   wxBrush* m_activeBrush;
   
